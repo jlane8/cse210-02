@@ -7,35 +7,33 @@ import random
 
 # class declaration
 class Deck:
+    
+    
+    # global deck, so all methods can access it
     deck = []
 
+    # constructor
     def __init__(self):
         self.card = 1
         self.shuffle()
 
+    # set up, renew deck
     def shuffle(self):
         
         # zero deck out
-        #self.deck = []
+        self.deck = []
 
         # put four sets of 13 cards in the deck
-        for index in range(0, 4):
+        for m in range(0, 4):
             for index2 in range(1, 14):
                 self.deck.append(index2)
-        
-        self.show_deck()
-        print("Finished with setup.")
 
+    # randomly select new card, renew deck when halfway
     def get_card(self):
         limit = len(self.deck) - 1
-        print(f"Deck size: {limit + 1}")
         select = random.randint(0, limit)
-        print(f"Selected: {select}")
         value = self.deck[select]
-        print(f"Value: {value}")
         del self.deck[select]
+        if len(self.deck) < 26:
+            self.shuffle()
         return value
-
-    def show_deck(self):
-        for i in range(len(self.deck)):
-            print(f"Card: {self.deck[i]}")
