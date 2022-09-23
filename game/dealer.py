@@ -4,7 +4,6 @@ Author: Jerry Lane
 Purpose: To handle the game action
 """
 from game.deck import Deck
-from game.score import Score
 
 # class declaration
 class Dealer:
@@ -34,11 +33,10 @@ class Dealer:
         self.deck = Deck()
         self.previous_card = self.deck.get_card()
         self.current_card = 0
-        self.score_object = Score()
-        self.score = self.score_object.get_score()
+        self.score = 0
 
     # method to collect the input from the player and do minimal validation checking
-    def get_input(self):
+    def get_input(self, prompt, key):
         """
         Parameters: none
         Return: valid choice or "invalid" to signify a bad input
@@ -46,16 +44,25 @@ class Dealer:
         the appropriate information. 
         """
         # get user input
-        choice = input("Will the next card be (h)igher or (l)ower (or (q)uit)? ")
+        choice = input(prompt)
         
-        # if input doesn't consist of h, l, or q, display error message to user and return "invalid"
-        if choice != "h" and choice != "l" and choice != "q":
-            print("Your selection must be a q for quit, an h for higher, or an l for lower.")
-            return "invalid"
-        
-        # if input is good, return valid choice
-        else:
+        # if input h or l and key is 1, return choice
+        if (choice == "h" or choice == "l") and key == 1:
             return choice
+        
+        # if input y or n and key is 2, return choice
+        elif (choice == "y" or choice == "n") and key == 2:
+            return choice
+
+        # if input is bad, display reason, return "invalid"
+        else:
+            if key == 1:
+                print("Your selection must be an h for higher, or an l for lower.")
+            elif key == 2:
+                print("Your selection must be a 'y' for yes, or a 'n' for no.")
+            if key == 2 and choice == "":
+                return "y"
+            return "invalid"
 
     # method which controls game play
     def start_game(self):
@@ -69,55 +76,86 @@ class Dealer:
         """
         # main game loop starts by printing out the previous card and setting the validate loop control
         while self.is_playing:
-            print(f"\nPrevious card: {self.previous_card}")
+            print(f"\nThe card is: {self.previous_card}")
             is_valid = False
+            high_low = False
+            yes_no = False
             
             # loop until valid input is given
             while not is_valid:
-                choice = self.get_input()
+                
+                # ask user for yes or no, make sure
+                if high_low == False and yes_no == False:
+                    choice = self.get_input("Higher or lower? [h/l] ", 1)
                 
                 # if the input is good, run the rest of the program, otherwise loop back for another
                 # attempt to validate a good input
-                if choice != "invalid":
+                if choice != "invalid" and high_low == False:
+
+                    # show first question's answer is good
+                    high_low = True
 
                     # get the next card from the Deck
                     self.current_card = self.deck.get_card()
 
                     # print the current card so user can see what it is
-                    print(f"Current card: {self.current_card}")
-                    
-                    # since the input was valid, turn off the validate input loop
-                    is_valid = True
+                    print(f"Next card was: {self.current_card}")
 
                     # handle the user's higher choice:
-                    # notify Score object's method of correct or incorrect choice
-                    # and let Score method adjust the score accordingly
+                    # if h is True, send to calc_score
+                    # otherwise send False to calc_score
                     if choice == "h" and self.current_card > self.previous_card:
-                        self.score = self.score_object.choice(True)
-                        print("Correct! ", end="")
+                        self.score = self.calc_score(True)
                     elif choice == "h" and self.current_card <= self.previous_card:
-                        self.score = self.score_object.choice(False)
-                        print("Sorry, incorrect! ", end="")
+                        self.score = self.calc_score(False)
 
                     # handle lower choice
-                    # notify Score object's method of correct or incorrect choice
-                    # and let Score method adjust the score accordingly
+                    # if l is True, send to calc_score
+                    # otherwise send False to calc_score
                     if choice == "l" and self.current_card < self.previous_card:
-                        self.score = self.score_object.choice(True)
-                        print("Correct! ", end="")
+                        self.score = self.calc_score(True)
                     elif choice == "l" and self.current_card >= self.previous_card:
-                        self.score = self.score_object.choice(False)
-                        print("Sorry, incorrect! ", end="")
-                    
-                    # handle quit choice or balance dropping to zero
-                    if choice == "q" or self.score == 0:
-                        self.is_playing = False
-                    
-                    # display score in case of continuing, quitting, or game ending 
-                    if self.is_playing:
-                        print(f"Current score: {self.score}")
-                    else:
-                        print(f"Final score: {self.score}\n")
-                    
-                    # move current card to previous card in preparation of next loop
-                    self.previous_card = self.current_card
+                        self.score = self.calc_score(False)
+
+                # ask user if they want to play again
+                if high_low == True and yes_no == False:
+                    play = self.get_input("Play again? [y/n] ", 2)
+
+                    # check for valid answer and run appropriately
+                    if play != "invalid" and high_low == True and yes_no == False:
+
+                        # show answer was either a y or n
+                        yes_no = True
+                        
+                        # end turn control loop
+                        is_valid = True
+
+                        # move current card to previous card in preparation of next loop, if applicable
+                        self.previous_card = self.current_card
+
+                        # handle quit choice or balance dropping to zero, end game
+                        if play == "n" or self.score == 0:
+                            self.is_playing = False
+                        
+                        # display score in case of continuing, quitting, or game ending 
+                        if self.is_playing:
+                            print(f"Current score: {self.score}")
+                        else:
+                            print(f"Final score: {self.score}\n")
+
+    def calc_score(self, is_correct):
+         
+         # if player guessed correctly, add 100 to the score
+        if is_correct:
+            self.score += 100
+
+        # if not, subtract 75 from the current score    
+        elif not is_correct:
+            self.score -= 75
+
+        # if balance drops below 0, balance = 0
+        if self.score < 0:
+            self.score = 0
+        
+        # return new current score
+        return self.score
