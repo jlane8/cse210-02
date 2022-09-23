@@ -33,7 +33,7 @@ class Dealer:
         self.deck = Deck()
         self.previous_card = self.deck.get_card()
         self.current_card = 0
-        self.score = 0
+        self.score = 300
 
     # method to collect the input from the player and do minimal validation checking
     def get_input(self, prompt, key):
@@ -60,8 +60,6 @@ class Dealer:
                 print("Your selection must be an h for higher, or an l for lower.")
             elif key == 2:
                 print("Your selection must be a 'y' for yes, or a 'n' for no.")
-            if key == 2 and choice == "":
-                return "y"
             return "invalid"
 
     # method which controls game play
@@ -80,6 +78,7 @@ class Dealer:
             is_valid = False
             high_low = False
             yes_no = False
+            play = "y"
             
             # loop until valid input is given
             while not is_valid:
@@ -118,7 +117,7 @@ class Dealer:
                         self.score = self.calc_score(False)
 
                 # ask user if they want to play again
-                if high_low == True and yes_no == False:
+                if high_low == True and yes_no == False and self.score > 0:
                     play = self.get_input("Play again? [y/n] ", 2)
 
                     # check for valid answer and run appropriately
@@ -132,16 +131,21 @@ class Dealer:
 
                         # move current card to previous card in preparation of next loop, if applicable
                         self.previous_card = self.current_card
-
-                        # handle quit choice or balance dropping to zero, end game
-                        if play == "n" or self.score == 0:
-                            self.is_playing = False
                         
                         # display score in case of continuing, quitting, or game ending 
                         if self.is_playing:
                             print(f"Current score: {self.score}")
                         else:
                             print(f"Final score: {self.score}\n")
+
+                        if play == "n":
+                            self.is_playing = False
+
+                # handle quit choice or balance dropping to zero, end game
+                if self.score == 0:
+                    self.is_playing = False
+                    is_valid = True
+                    print(f"Final score: {self.score}\nGame over! \n")
 
     def calc_score(self, is_correct):
          
