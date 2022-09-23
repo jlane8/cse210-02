@@ -147,7 +147,15 @@ class Dealer:
                     is_valid = True
                     print(f"Final score: {self.score}\nGame over! \n")
 
+    # method ot calculate player's score based on whether the guess was right or not
     def calc_score(self, is_correct):
+        """
+        Parameter: is_correct, boolean to signify whether player's guess was correct
+                   or not
+        Return: score, player's current score
+        This class will calculate the player's new score based on whether the guess
+        was correct or not
+        """
          
          # if player guessed correctly, add 100 to the score
         if is_correct:
@@ -157,7 +165,7 @@ class Dealer:
         elif not is_correct:
             self.score -= 75
 
-        # if balance drops below 0, balance = 0
+        # if balance drops below 0, zero balances
         if self.score < 0:
             self.score = 0
         
