@@ -169,6 +169,8 @@ class Dealer:
         # let loop run until a valid response is given
         while not is_valid:
             
+        # temp code to test without being asked if I want to continue
+
             # get input from player
             choice = input(self.choices[self.phase])
             
