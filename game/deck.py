@@ -17,7 +17,7 @@ class Deck:
     
     # global deck, (and suits list) so all methods can access it
     deck = []
-    suits = [] # not yet implemented - for future development
+    suits = [] 
 
     # constructor
     def __init__(self):
@@ -42,6 +42,7 @@ class Deck:
         
         # zero deck out so the completed deck has exactly 52 cards
         self.deck = []
+        self.suits = []
 
         # put four sets of 13 cards in the deck, one for each suit
         for suit in range(0, 4):
@@ -65,7 +66,7 @@ class Deck:
         # select the next card from the deck randomly
         select = random.randint(0, limit)
 
-        # get the value of the card and store it in a variable
+        # get the suit and value of the card and store it in a list variable
         if self.suits[select] == 0:
             suit = "\033[1;30m\u2660\033[00m"
         elif self.suits[select] == 1:
@@ -76,13 +77,14 @@ class Deck:
             suit = "\033[1;31m\u2666\033[00m"
         value = [self.deck[select], suit]
 
-        # delete the card from the deck
+        # delete the used card from the deck
         del self.deck[select]
         del self.suits[select]
 
         # if the deck is over half used, shuffle a new one up
         if len(self.deck) < 26:
             self.shuffle()
+            print("\nReshuffling the deck...\n")
         
         # return the value of the newly drawn card
         return value
