@@ -1,7 +1,7 @@
 """
 File: deck.py
 Author: Jerry Lane
-Purpose: Handles the cards in the deck created by Dealer
+Purpose: Handles the cards in the Deck
 """
 # import the random module to use it in randomly selecting a new card from the deck
 import random
@@ -43,9 +43,7 @@ class Deck:
         # zero deck out so the completed deck has exactly 52 cards
         self.deck = []
 
-        # put four sets of 13 cards in the deck - currently the suits list is unused, but
-        # I may use it later to keep track of the suits to display to the player (to keep
-        # the play more realistic).
+        # put four sets of 13 cards in the deck, one for each suit
         for suit in range(0, 4):
             for value in range(1, 14):
                 self.deck.append(value)
@@ -68,10 +66,19 @@ class Deck:
         select = random.randint(0, limit)
 
         # get the value of the card and store it in a variable
-        value = self.deck[select]
+        if self.suits[select] == 0:
+            suit = "\033[1;30m\u2660\033[00m"
+        elif self.suits[select] == 1:
+            suit = "\033[1;30m\u2663\033[00m"
+        elif self.suits[select] == 2:
+            suit = "\033[1;31m\u2665\033[00m"
+        elif self.suits[select] == 3:
+            suit = "\033[1;31m\u2666\033[00m"
+        value = [self.deck[select], suit]
 
         # delete the card from the deck
         del self.deck[select]
+        del self.suits[select]
 
         # if the deck is over half used, shuffle a new one up
         if len(self.deck) < 26:
